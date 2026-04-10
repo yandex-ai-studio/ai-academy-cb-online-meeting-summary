@@ -1,0 +1,37 @@
+# Dockerfile для Railway deployment
+# Использует переменную окружения PORT, которую устанавливает Railway
+FROM python:3.11-slim
+
+# Установка системных зависимостей
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    libsndfile1 \
+    git \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Создание рабочей директории
+WORKDIR /app
+
+# Копирование requirements
+COPY requirements.txt .
+
+# Установка Python зависимостей
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Копирование кода приложения
+COPY . .
+
+# Создание необходимых директорий
+RUN mkdir -p /app/uploads /app/results /app/static
+
+# Установка переменных окружения
+ENV PYTHONUNBUFFERED=1
+
+# Экспорт порта (Railway будет использовать переменную PORT)
+EXPOSE 8000
+
+# Команда запуска (использует PORT из окружения Railway, по умолчанию 8000)
+CMD uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}
+

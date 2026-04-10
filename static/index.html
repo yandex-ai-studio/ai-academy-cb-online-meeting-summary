@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Summarizer - Саммаризация встреч</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">
+                <i class="fas fa-microphone-alt mr-3 text-blue-600"></i>
+                Meeting Summarizer
+            </h1>
+            <p class="text-gray-600">Транскрибация и саммаризация встреч с разделением спикеров</p>
+        </header>
+
+        <!-- Credentials Section -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+                <h2 class="text-2xl font-semibold text-gray-800">
+                    <i class="fas fa-key mr-2 text-blue-600"></i>
+                    Настройки доступа
+                </h2>
+                <button id="openInstructionsBtn" class="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-2">
+                    <i class="fas fa-info-circle"></i>
+                    Как получить ключи?
+                </button>
+            </div>
+            <div class="grid md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label for="apiKeyInput" class="block text-sm font-medium text-gray-700 mb-1">YANDEX_API_KEY</label>
+                    <input type="password" id="apiKeyInput" class="w-full rounded border-gray-300 focus:border-blue-500 focus:ring-blue-500" placeholder="API Key" autocomplete="off">
+                </div>
+                <div>
+                    <label for="folderIdInput" class="block text-sm font-medium text-gray-700 mb-1">YANDEX_FOLDER_ID</label>
+                    <input type="text" id="folderIdInput" class="w-full rounded border-gray-300 focus:border-blue-500 focus:ring-blue-500" placeholder="Folder ID">
+                </div>
+                <div>
+                    <label for="gptKeyInput" class="block text-sm font-medium text-gray-700 mb-1">YANDEXGPT_API_KEY (опционально)</label>
+                    <input type="password" id="gptKeyInput" class="w-full rounded border-gray-300 focus:border-blue-500 focus:ring-blue-500" placeholder="Если отличается от основного ключа" autocomplete="off">
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <button id="saveCredentialsBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                    Сохранить ключи локально
+                </button>
+                <button id="clearCredentialsBtn" class="text-gray-600 hover:text-gray-900 flex items-center gap-2">
+                    <i class="fas fa-trash"></i>
+                    Очистить
+                </button>
+                <p class="text-sm text-gray-500 mt-2 md:mt-0">Ключи сохраняются только в вашем браузере и отправляются с запросами на обработку.</p>
+            </div>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">
+                <i class="fas fa-upload mr-2 text-blue-600"></i>
+                Загрузка файла
+            </h2>
+            
+            <div id="uploadArea" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors cursor-pointer">
+                <i class="fas fa-cloud-upload-alt text-6xl text-gray-400 mb-4"></i>
+                <p class="text-gray-600 mb-2">Перетащите файл сюда или нажмите для выбора</p>
+                <p class="text-sm text-gray-500">Поддерживаются: MP4, MP3, WAV, OGG (до 2GB)</p>
+                <input type="file" id="fileInput" class="hidden" accept=".mp4,.mp3,.wav,.ogg">
+            </div>
+
+            <div id="fileInfo" class="mt-4 hidden">
+                <div class="bg-blue-50 border border-blue-200 rounded p-4">
+                    <p class="text-blue-800">
+                        <i class="fas fa-file mr-2"></i>
+                        <span id="fileName"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div id="progressSection" class="bg-white rounded-lg shadow-md p-6 mb-6 hidden">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">
+                <i class="fas fa-spinner fa-spin mr-2 text-blue-600"></i>
+                Обработка
+            </h2>
+            
+            <div class="mb-4">
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-700 font-medium">Прогресс</span>
+                    <span id="progressPercent" class="text-gray-700 font-bold">0%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-4">
+                    <div id="progressBar" class="bg-blue-600 h-4 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <p id="progressMessage" class="text-gray-600 text-center">Ожидание начала обработки...</p>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="hidden">
+            <!-- Summary -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">
+                    <i class="fas fa-file-alt mr-2 text-blue-600"></i>
+                    Саммари
+                </h2>
+                <div id="summaryContent"></div>
+            </div>
+
+            <!-- Speakers -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">
+                    <i class="fas fa-users mr-2 text-blue-600"></i>
+                    Спикеры
+                </h2>
+                <div id="speakersContent"></div>
+            </div>
+
+            <!-- Transcription -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">
+                    <i class="fas fa-align-left mr-2 text-blue-600"></i>
+                    Полный транскрипт
+                </h2>
+                <div id="transcriptionContent" class="max-h-96 overflow-y-auto"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-12 py-6 text-center text-gray-600 border-t border-gray-200">
+        <p class="text-sm">
+            Follow <a href="https://t.me/llm_notes" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 font-medium underline">@llm_notes</a> on Telegram for AI updates
+        </p>
+    </footer>
+
+    <!-- Instructions Modal -->
+    <div id="instructionsModal" class="modal hidden">
+        <div id="instructionsOverlay" class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-2xl font-semibold text-gray-800 flex items-center gap-2">
+                    <i class="fas fa-graduation-cap text-blue-600"></i>
+                    Как получить ключи Yandex Cloud
+                </h3>
+                <button class="instructions-close text-gray-500 hover:text-gray-800">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <div class="space-y-6">
+                <section>
+                    <h4 class="font-semibold text-gray-800 mb-2">Шаг 1. Создайте сервисный аккаунт</h4>
+                    <ol class="list-decimal list-inside text-gray-700 space-y-1">
+                        <li>Зайдите в <a href="https://console.cloud.yandex.ru/" target="_blank" class="text-blue-600 underline">Yandex Cloud Console</a>.</li>
+                        <li>Выберите каталог (Folder), где будет работать сервис.</li>
+                        <li>Откройте раздел <strong>\"Сервисные аккаунты\"</strong> и создайте новый.</li>
+                    </ol>
+                </section>
+
+                <section>
+                    <h4 class="font-semibold text-gray-800 mb-2">Шаг 2. Назначьте роли</h4>
+                    <p class="text-gray-700 mb-2">Сервисному аккаунту нужны роли:</p>
+                    <ul class="list-disc list-inside text-gray-700 space-y-1">
+                        <li><code>ai.speechkit-stt.user</code> — для транскрибации.</li>
+                        <li><code>ai.languageModels.user</code> — для использования YandexGPT.</li>
+                        <li>Дополнительно: <code>storage.viewer</code> (если планируется использование Object Storage).</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h4 class="font-semibold text-gray-800 mb-2">Шаг 3. Создайте API-ключ</h4>
+                    <ol class="list-decimal list-inside text-gray-700 space-y-1">
+                        <li>В разделе сервисного аккаунта выберите вкладку <strong>\"API-ключи\"</strong>.</li>
+                        <li>Создайте ключ и сохраните его — он будет нужен для полей <code>YANDEX_API_KEY</code> и (при необходимости) <code>YANDEXGPT_API_KEY</code>.</li>
+                        <li>Скопируйте <strong>Folder ID</strong> из верхнего меню консоли или раздела каталога.</li>
+                    </ol>
+                </section>
+
+                <section>
+                    <h4 class="font-semibold text-gray-800 mb-2">Советы по безопасности</h4>
+                    <ul class="list-disc list-inside text-gray-700 space-y-1">
+                        <li>Не делитесь API-ключами с третьими лицами.</li>
+                        <li>При потере ключа немедленно отозовите его в консоли Yandex Cloud.</li>
+                        <li>Храните ключи в защищённом месте, а в приложении используйте поле \"Очистить\" при работе на публичных компьютерах.</li>
+                    </ul>
+                </section>
+
+                <button class="instructions-close w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition">
+                    Понятно, закрыть
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,27 @@
+# FastAPI and server
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+aiofiles==23.2.1
+pydantic==2.5.0
+
+# Audio processing
+moviepy==1.0.3
+pydub==0.25.1
+
+# Yandex Cloud SDK
+yandexcloud==0.242.0
+grpcio==1.59.3
+grpcio-tools==1.59.3
+
+# HTTP client for YandexGPT
+httpx==0.25.2
+
+# Additional utilities
+python-dotenv==1.0.0
+
+
+
+
+
+

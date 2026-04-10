@@ -1,0 +1,92 @@
+/* Дополнительные стили для Meeting Summarizer */
+
+.hidden {
+    display: none;
+}
+
+#uploadArea.drag-over {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+}
+
+/* Анимация для прогресс-бара */
+#progressBar {
+    transition: width 0.3s ease-in-out;
+}
+
+/* Стили для результатов */
+#summaryContent,
+#speakersContent,
+#transcriptionContent {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Стили для сегментов транскрипции */
+.transcript-segment {
+    border-left: 3px solid #3b82f6;
+    padding-left: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Скроллбар для транскрипта */
+#transcriptionContent::-webkit-scrollbar {
+    width: 8px;
+}
+
+#transcriptionContent::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+#transcriptionContent::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+#transcriptionContent::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Modal styles */
+.modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+}
+
+.modal-content {
+    position: relative;
+    background: #ffffff;
+    border-radius: 1rem;
+    padding: 2rem;
+    width: min(900px, 90%);
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.3);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
