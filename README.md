@@ -252,4 +252,4 @@ MIT
 
 ## Автор
 
-2025 Meeting Summarizer Project
+Copyright © 2026 YANDEX LLC
