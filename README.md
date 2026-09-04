@@ -10,6 +10,8 @@
 - 🐳 Docker-контейнеризация для лёгкого развёртывания
 - 🌐 Веб-интерфейс для загрузки файлов и просмотра результатов
 
+> 🚀 **[Повторить с AI Studio →](https://aistudio.yandex.ru/platform?utm_source=github&utm_medium=owned&utm_campaign=t:info;gl:lgen&utm_content=cookbook_online_meeting_summary)**
+
 ## Требования
 
 - Docker 20.10+ и Docker Compose;
@@ -242,7 +244,9 @@ pip install -r requirements.txt
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### Тестирование
+> 🚀 **[Повторить с AI Studio →](https://aistudio.yandex.ru/platform?utm_source=github&utm_medium=owned&utm_campaign=t:info;gl:lgen&utm_content=cookbook_online_meeting_summary)**
+
+## Тестирование
 
 API документация доступна по адресу: `http://localhost:8000/docs`
 
